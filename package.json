@@ -1,0 +1,38 @@
+{
+    "name": "borokero-iot-http",
+    "version": "0.0.0",
+    "description": "mqtt broker based on aedes",
+    "homepage": "https://github.com/borokero/borokero-iot-mqtt#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/borokero/borokero-iot-mqtt.git"
+    },
+    "main": "./index.js",
+    "scripts": {
+        "version": "echo $npm_package_version",
+        "start": "node -r dotenv/config ./index.js",
+        "pretest": "bash ./scripts/start-server.sh",
+        "test": "mocha --recursive --bail --reporter spec test",
+        "startmon": "DEBUG=* nodemon ./index",
+        "clean-install": "sudo rm -rf node_modules && npm install"
+    },
+    "author": "Hadi Mahdavi",
+    "license": "ISC",
+    "dependencies": {
+        "aedes": "0.46.0",
+        "aedes-persistence-mongodb": "8.2.0",
+        "debug": "4.3.1",
+        "dotenv": "10.0.0",
+        "mqemitter-mongodb": "7.0.4"
+    },
+    "devDependencies": {
+        "chai": "~3.5.0",
+        "mocha": "~3.2.0",
+        "pre-commit": "~1.2.2",
+        "sinon": "~1.17.7",
+        "superagent": "~3.3.1",
+        "supertest": "~2.0.1",
+        "tmp": "0.0.31"
+    },
+    "docker-user": "borokero"
+}
