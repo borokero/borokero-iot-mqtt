@@ -1,5 +1,5 @@
 {
-    "name": "borokero-iot-http",
+    "name": "borokero-iot-mqtt",
     "version": "0.0.0",
     "description": "mqtt broker based on aedes",
     "homepage": "https://github.com/borokero/borokero-iot-mqtt#readme",
