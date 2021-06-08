@@ -4,9 +4,10 @@
  * this test inspired by Aedes and Ponte project, a work by Matteo Collina
  *    Matteo Collina - https://github.com/eclipse/ponte
  *******************************************************************************/
+
+require('dotenv').config('/.env')
 var mqtt = require('mqtt')
-var aedes = require('aedes')()
-var authBroker = require('../lib/authbroker')
+var Broker = require('../lib/broker')
 var expect = require('expect.js')
 
 describe('Test against MQTT server', function () {
@@ -18,57 +19,33 @@ describe('Test against MQTT server', function () {
     var anotherAllowedTopic = 'mohammad/fan'
     const port = 1883
 
-
-    var envAuth = {
-        auth: {
-            realm: "tokenRealmTest",
-            "auth-server-url": "http://localhost:8080/auth",
-            "ssl-required": "external",
-            resource: "admin-cli",
-            "public-client": true,
-            "confidential-port": 0,
+    const options = {
+        mqtt: {
+          port: 1883
         },
-        jwt: {
-            salt: 'salt', //salt by pbkdf2 method
-            digest: 'sha512',
-            // size of the generated hash
-            hashBytes: 64,
-            // larger salt means hashed passwords are more resistant to rainbow table, but
-            // you get diminishing returns pretty fast
-            saltBytes: 16,
-            // more iterations means an attacker has to take longer to brute force an
-            // individual password, so larger is better. however, larger also means longer
-            // to hash the password. tune so that hashing the password takes about a
-            // second
-            iterations: 10
+        db: {
+          url: process.env.MONGO_URL,
+          // Optional ttl settings
+          ttl: {
+            packets: process.env.MONGO_TTL_PACKETS, // Number of seconds
+            subscriptions: process.env.MONGO_TTL_SUB
+          }
         },
-        wildCard: {
-            wildcardOne: '+',
-            wildcardSome: '#',
-            separator: '/'
-        },
-        adapters: {
-            mqtt: {
-                limitW: 50,
-                limitMPM: 10
-            }
+        envAuth: {
+          auth: {
+            realm: process.env.REALM,
+            "auth-server-url": process.env.AUTH_SERVER_URL,
+            "ssl-required": process.env.SSL_REQUIRED,
+            resource: process.env.RESOURCE,
+            "public-client": process.env.PUBLIC_CLIENT,
+            "confidential-port": process.env.CONFIDENTIAL_PORT,
+          }
         }
-    }
-
+      }     
+      
     before(function (done) {
-        var authbroker = new authBroker(envAuth)
-
-        aedes.authenticate = authbroker.authenticateWithCredentials()
-        aedes.authorizeSubscribe = authbroker.authorizeSubscribe()
-        aedes.authorizePublish = authbroker.authorizePublish()
-
-        const server = require('net').createServer(aedes.handle)
-
-        server.listen(port, function () {
-            console.log('server listening on port', port)
-            done()
-        })
-
+        var broker = new Broker(options)
+        broker.build(done)
     })
 
     /*
