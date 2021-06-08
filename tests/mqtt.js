@@ -5,55 +5,60 @@
  *    Matteo Collina - https://github.com/eclipse/ponte
  *******************************************************************************/
 
-require('dotenv').config('/.env')
+require('dotenv').config('/.sample.env')
 var mqtt = require('mqtt')
 var Broker = require('../lib/broker')
+const {
+    describe,
+    it
+} = require('mocha')
 var expect = require('expect.js')
 
-describe('Test against MQTT server', function () {
-    var username = 'mahdi'
-    let clientId = 'mqtt'
-    var password = 'password'
-    var wrongPassword = 'wrong'
-    var topic = 'mahdi/lamp'
-    var anotherAllowedTopic = 'mohammad/fan'
-    const port = 1883
+var username = 'mahdi'
+let clientId = 'mqtt'
+var password = 'password'
+var wrongPassword = 'wrong'
+var topic = 'mahdi/lamp'
+var anotherAllowedTopic = 'mohammad/fan'
+const port = 1883
 
-    const options = {
-        mqtt: {
-          port: 1883
-        },
-        db: {
-          url: process.env.MONGO_URL,
-          // Optional ttl settings
-          ttl: {
+const options = {
+    mqtt: {
+        port: 1883
+    },
+    db: {
+        url: process.env.MONGO_URL,
+        // Optional ttl settings
+        ttl: {
             packets: process.env.MONGO_TTL_PACKETS, // Number of seconds
             subscriptions: process.env.MONGO_TTL_SUB
-          }
-        },
-        envAuth: {
-          auth: {
+        }
+    },
+    envAuth: {
+        auth: {
             realm: process.env.REALM,
             "auth-server-url": process.env.AUTH_SERVER_URL,
             "ssl-required": process.env.SSL_REQUIRED,
             resource: process.env.RESOURCE,
             "public-client": process.env.PUBLIC_CLIENT,
             "confidential-port": process.env.CONFIDENTIAL_PORT,
-          }
         }
-      }     
-      
+    }
+}
+var broker = new Broker(options)
+
+
+describe('Test against MQTT server', function () {
+
     before(function (done) {
-        var broker = new Broker(options)
         broker.build(done)
     })
 
-    /*
-    afterEach(function (done) {
-        instance.close(done)
 
+    after(function (done) {
+        broker.close()
+        done()
     })
-    */
 
 
     function connect(options) {
@@ -78,7 +83,6 @@ describe('Test against MQTT server', function () {
             .subscribe(topic)
             .publish(topic, 'world')
             .on('message', function (topicname, payload) {
-                //console.log(topic + ' ; ' + payload)
                 expect(topicname).to.eql(topic)
                 expect(payload.toString()).to.eql('world')
                 done()
@@ -102,7 +106,6 @@ describe('Test against MQTT server', function () {
             .subscribe(anotherAllowedTopic)
             .publish(anotherAllowedTopic, 'world')
             .on('message', function (topicname, payload) {
-                //console.log(topic + ' ; ' + payload)
                 expect(topicname).to.eql(anotherAllowedTopic)
                 expect(payload.toString()).to.eql('world')
                 done()
@@ -149,7 +152,6 @@ describe('Test against MQTT server', function () {
         })
         client.on('error', function (error) {
             client.end()
-            //console.log(error)
             expect(error.message).to.eql('Connection refused: Not authorized')
             done()
         })

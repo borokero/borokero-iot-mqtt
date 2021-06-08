@@ -11,8 +11,8 @@
     "scripts": {
         "version": "echo $npm_package_version",
         "start": "node -r dotenv/config ./index.js",
-        "pretest": "sudo bash ./scripts/start-server.sh && sudo cp .sample.env .env",
-        "test": "mocha --recursive --bail --reporter spec tests",
+        "pretest": "sudo bash ./scripts/start-server.sh",
+        "test": "mocha --exit tests",
         "startmon": "DEBUG=* nodemon ./index",
         "clean-install": "sudo rm -rf node_modules && npm install"
     },
