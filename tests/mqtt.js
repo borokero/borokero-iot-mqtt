@@ -5,7 +5,7 @@
  *    Matteo Collina - https://github.com/eclipse/ponte
  *******************************************************************************/
 
-require('dotenv').config('/.sample.env')
+require('dotenv').config('../.sample.env')
 var mqtt = require('mqtt')
 var Broker = require('../lib/broker')
 const {
