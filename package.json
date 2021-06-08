@@ -19,6 +19,7 @@
     "author": "Hadi Mahdavi",
     "license": "ISC",
     "dependencies": {
+        "@borokero/borokero-auth": "0.0.2-development",
         "aedes": "0.46.0",
         "aedes-persistence-mongodb": "8.2.0",
         "debug": "4.3.1",
