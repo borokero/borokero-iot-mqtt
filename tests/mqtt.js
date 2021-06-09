@@ -5,7 +5,9 @@
  *    Matteo Collina - https://github.com/eclipse/ponte
  *******************************************************************************/
 
-require('dotenv').config('/.sample.env')
+require('dotenv').config({
+    path: '.env.sample'
+})
 var mqtt = require('mqtt')
 var Broker = require('../lib/broker')
 const {
@@ -20,11 +22,11 @@ var password = 'password'
 var wrongPassword = 'wrong'
 var topic = 'mahdi/lamp'
 var anotherAllowedTopic = 'mohammad/fan'
-const port = 1883
+const port = process.env.MQTT_PORT
 
 const options = {
     mqtt: {
-        port: 1883
+        port: process.env.MQTT_PORT
     },
     db: {
         url: process.env.MONGO_URL,
@@ -56,8 +58,7 @@ describe('Test against MQTT server', function () {
 
 
     after(function (done) {
-        broker.close()
-        done()
+        broker.close(done)
     })
 
 
