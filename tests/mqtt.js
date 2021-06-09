@@ -59,8 +59,7 @@ describe('Test against MQTT server', function () {
 
 
     after(function (done) {
-        broker.close()
-        done()
+        broker.close(done)
     })
 
 
