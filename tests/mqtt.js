@@ -24,7 +24,6 @@ var topic = 'mahdi/lamp'
 var anotherAllowedTopic = 'mohammad/fan'
 const port = process.env.MQTT_PORT
 
-console.log(process.env.MONGO_URL)
 const options = {
     mqtt: {
         port: process.env.MQTT_PORT
