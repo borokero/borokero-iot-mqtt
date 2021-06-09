@@ -4,79 +4,62 @@
  * this test inspired by Aedes and Ponte project, a work by Matteo Collina
  *    Matteo Collina - https://github.com/eclipse/ponte
  *******************************************************************************/
+
+require('dotenv').config({
+    path: '.env.sample'
+})
 var mqtt = require('mqtt')
-var aedes = require('aedes')()
-var authBroker = require('../lib/authbroker')
+var Broker = require('../lib/broker')
+const {
+    describe,
+    it
+} = require('mocha')
 var expect = require('expect.js')
 
-describe('Test against MQTT server', function () {
-    var username = 'mahdi'
-    let clientId = 'mqtt'
-    var password = 'password'
-    var wrongPassword = 'wrong'
-    var topic = 'mahdi/lamp'
-    var anotherAllowedTopic = 'mohammad/fan'
-    const port = 1883
+var username = 'mahdi'
+let clientId = 'mqtt'
+var password = 'password'
+var wrongPassword = 'wrong'
+var topic = 'mahdi/lamp'
+var anotherAllowedTopic = 'mohammad/fan'
+const port = process.env.MQTT_PORT
 
-
-    var envAuth = {
+const options = {
+    mqtt: {
+        port: process.env.MQTT_PORT
+    },
+    db: {
+        url: process.env.MONGO_URL,
+        // Optional ttl settings
+        ttl: {
+            packets: process.env.MONGO_TTL_PACKETS, // Number of seconds
+            subscriptions: process.env.MONGO_TTL_SUB
+        }
+    },
+    envAuth: {
         auth: {
-            realm: "tokenRealmTest",
-            "auth-server-url": "http://localhost:8080/auth",
-            "ssl-required": "external",
-            resource: "admin-cli",
-            "public-client": true,
-            "confidential-port": 0,
-        },
-        jwt: {
-            salt: 'salt', //salt by pbkdf2 method
-            digest: 'sha512',
-            // size of the generated hash
-            hashBytes: 64,
-            // larger salt means hashed passwords are more resistant to rainbow table, but
-            // you get diminishing returns pretty fast
-            saltBytes: 16,
-            // more iterations means an attacker has to take longer to brute force an
-            // individual password, so larger is better. however, larger also means longer
-            // to hash the password. tune so that hashing the password takes about a
-            // second
-            iterations: 10
-        },
-        wildCard: {
-            wildcardOne: '+',
-            wildcardSome: '#',
-            separator: '/'
-        },
-        adapters: {
-            mqtt: {
-                limitW: 50,
-                limitMPM: 10
-            }
+            realm: process.env.REALM,
+            "auth-server-url": process.env.AUTH_SERVER_URL,
+            "ssl-required": process.env.SSL_REQUIRED,
+            resource: process.env.RESOURCE,
+            "public-client": process.env.PUBLIC_CLIENT,
+            "confidential-port": process.env.CONFIDENTIAL_PORT,
         }
     }
+}
+var broker = new Broker(options)
+
+
+describe('Test against MQTT server', function () {
 
     before(function (done) {
-        var authbroker = new authBroker(envAuth)
-
-        aedes.authenticate = authbroker.authenticateWithCredentials()
-        aedes.authorizeSubscribe = authbroker.authorizeSubscribe()
-        aedes.authorizePublish = authbroker.authorizePublish()
-
-        const server = require('net').createServer(aedes.handle)
-
-        server.listen(port, function () {
-            console.log('server listening on port', port)
-            done()
-        })
-
+        broker.build(done)
     })
 
-    /*
-    afterEach(function (done) {
-        instance.close(done)
 
+    after(function (done) {
+        broker.close(done)
     })
-    */
 
 
     function connect(options) {
@@ -101,7 +84,6 @@ describe('Test against MQTT server', function () {
             .subscribe(topic)
             .publish(topic, 'world')
             .on('message', function (topicname, payload) {
-                //console.log(topic + ' ; ' + payload)
                 expect(topicname).to.eql(topic)
                 expect(payload.toString()).to.eql('world')
                 done()
@@ -125,7 +107,6 @@ describe('Test against MQTT server', function () {
             .subscribe(anotherAllowedTopic)
             .publish(anotherAllowedTopic, 'world')
             .on('message', function (topicname, payload) {
-                //console.log(topic + ' ; ' + payload)
                 expect(topicname).to.eql(anotherAllowedTopic)
                 expect(payload.toString()).to.eql('world')
                 done()
@@ -172,7 +153,6 @@ describe('Test against MQTT server', function () {
         })
         client.on('error', function (error) {
             client.end()
-            //console.log(error)
             expect(error.message).to.eql('Connection refused: Not authorized')
             done()
         })

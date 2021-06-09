@@ -11,14 +11,15 @@
     "scripts": {
         "version": "echo $npm_package_version",
         "start": "node -r dotenv/config ./index.js",
-        "pretest": "bash ./scripts/start-server.sh",
-        "test": "mocha --recursive --bail --reporter spec test",
+        "pretest": "sudo bash ./scripts/start-server.sh",
+        "test": "mocha --exit tests",
         "startmon": "DEBUG=* nodemon ./index",
         "clean-install": "sudo rm -rf node_modules && npm install"
     },
     "author": "Hadi Mahdavi",
     "license": "ISC",
     "dependencies": {
+        "@borokero/borokero-auth": "0.0.2-development",
         "aedes": "0.46.0",
         "aedes-persistence-mongodb": "8.2.0",
         "debug": "4.3.1",
@@ -26,13 +27,9 @@
         "mqemitter-mongodb": "7.0.4"
     },
     "devDependencies": {
-        "chai": "~3.5.0",
-        "mocha": "~3.2.0",
-        "pre-commit": "~1.2.2",
-        "sinon": "~1.17.7",
-        "superagent": "~3.3.1",
-        "supertest": "~2.0.1",
-        "tmp": "0.0.31"
+        "expect.js": "0.3.1",
+        "mocha": "9.0.0",
+        "mqtt": "4.2.6"
     },
     "docker-user": "borokero"
 }

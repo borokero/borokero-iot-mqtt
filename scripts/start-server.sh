@@ -1,4 +1,7 @@
 #!/bin/bash
+#run mongodb
+sudo mkdir -p /mongodata
+docker run --name mongo -p 27017:27017 -v mongodata:/data/db -d mongo mongod
 
 # Pull the docker image with the latest changes on Keycloak
 docker pull quay.io/keycloak/keycloak
